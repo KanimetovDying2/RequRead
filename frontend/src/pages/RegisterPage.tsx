@@ -4,6 +4,8 @@ import { registerUser } from "../api/authApi";
 import { useAuthStore } from "../store/authStore";
 
 const RegisterPage = () => {
+  const emailRegex = /^\S+@\S+\.\S+$/;
+
   const navigate = useNavigate();
 
   const login = useAuthStore((state) => state.login);
@@ -33,6 +35,10 @@ const RegisterPage = () => {
     }
 
     try {
+      if (!emailRegex.test(form.email)) {
+        setError("Invalid email");
+        return;
+      }
       const data = await registerUser(form);
 
       login(data.user, data.token);

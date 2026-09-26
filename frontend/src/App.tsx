@@ -7,6 +7,7 @@ import RecipePage from "./pages/RecipePage";
 import UserRecipesPage from "./pages/UserRecipesPage";
 import CreateRecipePage from "./pages/CreateRecipePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
@@ -15,7 +16,14 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/recipes/:id" element={<RecipePage />} />
         <Route path="/users/:id" element={<UserRecipesPage />} />
-        <Route path="/create-recipe" element={<CreateRecipePage />} />
+        <Route
+          path="/create-recipe"
+          element={
+            <ProtectedRoute>
+              <CreateRecipePage />
+            </ProtectedRoute>
+          }
+        />
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
