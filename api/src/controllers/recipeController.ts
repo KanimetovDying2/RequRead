@@ -38,6 +38,20 @@ export const getRecipeById = async (req: Request, res: Response) => {
   }
 };
 
+export const getRecipesByUser = async (req: Request, res: Response) => {
+  try {
+    const recipes = await Recipe.find({
+      author: req.params.userId,
+    }).populate("author", "username avatar");
+
+    return res.json(recipes);
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 export const createRecipe = async (req: AuthRequest, res: Response) => {
   try {
     const { title, description } = req.body;
