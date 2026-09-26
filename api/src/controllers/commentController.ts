@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import Comment from "../models/Comment.js";
 import Recipe from "../models/Recipe.js";
-
-interface AuthRequest extends Request {
-  user?: any;
-}
+import { AuthRequest } from "../types/auth.js";
 
 export const getComments = async (req: Request, res: Response) => {
   try {
@@ -22,6 +19,12 @@ export const getComments = async (req: Request, res: Response) => {
 
 export const createComment = async (req: AuthRequest, res: Response) => {
   try {
+if (!req.user) {
+  return res.status(401).json({
+    message: "Unauthorized",
+  });
+}
+
     const { text } = req.body;
 
     if (!text?.trim()) {
@@ -54,6 +57,13 @@ export const createComment = async (req: AuthRequest, res: Response) => {
 
 export const deleteComment = async (req: AuthRequest, res: Response) => {
   try {
+
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+    
     const comment = await Comment.findById(req.params.id as string);
 
     if (!comment) {

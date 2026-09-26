@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import Recipe from "../models/Recipe.js";
-
-interface AuthRequest extends Request {
-  user?: any;
-}
+import { AuthRequest } from "../types/auth.js";
 
 export const getRecipes = async (req: Request, res: Response) => {
   try {
@@ -54,6 +51,12 @@ export const getRecipesByUser = async (req: Request, res: Response) => {
 
 export const createRecipe = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
     const { title, description } = req.body;
 
     const image = req.file?.path.replaceAll("\\", "/");
@@ -81,6 +84,12 @@ export const createRecipe = async (req: AuthRequest, res: Response) => {
 
 export const deleteRecipe = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
     const recipe = await Recipe.findById(req.params.id);
 
     if (!recipe) {

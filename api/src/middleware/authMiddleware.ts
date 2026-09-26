@@ -1,10 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-
-interface AuthRequest extends Request {
-  user?: any;
-}
+import { AuthRequest } from "../types/auth.js";
 
 const authMiddleware = async (
   req: AuthRequest,
@@ -40,7 +37,13 @@ const authMiddleware = async (
       });
     }
 
-    req.user = user;
+    req.user = {
+      _id: user._id.toString(),
+      email: user.email,
+      username: user.username,
+      avatar: user.avatar,
+      googleId: user.googleId,
+    };
 
     next();
   } catch (error) {
