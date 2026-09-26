@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -81,6 +84,60 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({
       message: "Server error",
+    });
+  }
+};
+
+export const googleAuth = async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({
+        message: "Google credential missing",
+      });
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload?.email || !payload.sub) {
+      return res.status(400).json({
+        message: "Invalid Google token",
+      });
+    }
+
+    const email = payload.email;
+    const googleId = payload.sub;
+    const username = payload.name || "Google User";
+    const avatar = payload.picture || "";
+
+    let user = await User.findOne({
+      email,
+    });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        username,
+        googleId,
+        avatar,
+      });
+    }
+
+    const token = generateToken(user._id.toString());
+
+    return res.json({
+      user,
+      token,
+    });
+  } catch (error) {
+    return res.status(401).json({
+      message: "Google authentication failed",
     });
   }
 };

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/authApi";
 import { useAuthStore } from "../store/authStore";
+import { GoogleLogin } from "@react-oauth/google";
+import api from "../api/axios";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -131,6 +133,27 @@ const LoginPage = () => {
           >
             Login
           </button>
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              if (credentialResponse.credential) {
+                try {
+                  const { data } = await api.post("/auth/google", {
+                    credential: credentialResponse.credential,
+                  });
+
+                  login(data.user, data.token);
+                  navigate("/");
+                } catch (error: any) {
+                  setError(
+                    error.response?.data?.message || "Google auth error",
+                  );
+                }
+              }
+            }}
+            onError={() => {
+              setError("Google Login Failed");
+            }}
+          />
         </form>
       </div>
     </div>
