@@ -51,7 +51,7 @@ const seed = async () => {
       {
         title: "Pasta",
         description: "Italian pasta recipe",
-        image: "uploads/pasta.jpg",
+        image: "uploads/pizza.jpg",
         author: user1._id,
       },
     ]);

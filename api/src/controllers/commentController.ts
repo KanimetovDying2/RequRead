@@ -19,11 +19,11 @@ export const getComments = async (req: Request, res: Response) => {
 
 export const createComment = async (req: AuthRequest, res: Response) => {
   try {
-if (!req.user) {
-  return res.status(401).json({
-    message: "Unauthorized",
-  });
-}
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
 
     const { text } = req.body;
 
@@ -42,12 +42,17 @@ if (!req.user) {
     }
 
     const comment = await Comment.create({
-      text,
+      text: text.trim(),
       author: req.user._id,
       recipe: req.params.recipeId as string,
     });
 
-    return res.status(201).json(comment);
+    const populatedComment = await comment.populate(
+      "author",
+      "username avatar",
+    );
+
+    return res.status(201).json(populatedComment);
   } catch (error) {
     return res.status(500).json({
       message: "Server error",
@@ -57,13 +62,12 @@ if (!req.user) {
 
 export const deleteComment = async (req: AuthRequest, res: Response) => {
   try {
-
     if (!req.user) {
       return res.status(401).json({
         message: "Unauthorized",
       });
     }
-    
+
     const comment = await Comment.findById(req.params.id as string);
 
     if (!comment) {
