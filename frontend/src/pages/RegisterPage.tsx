@@ -32,6 +32,11 @@ const RegisterPage = () => {
       return;
     }
 
+    if (form.password.trim().length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
     try {
       if (!emailRegex.test(form.email)) {
         setError("Invalid email");
