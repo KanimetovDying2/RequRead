@@ -4,6 +4,7 @@ import {
   getRecipes,
   getRecipeById,
   createRecipe,
+  deleteRecipe,
 } from "../controllers/recipeController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -15,5 +16,7 @@ router.get("/", getRecipes);
 router.get("/:id", getRecipeById);
 
 router.post("/", authMiddleware, createRecipe);
+
+router.delete("/:id", authMiddleware, deleteRecipe);
 
 export default router;

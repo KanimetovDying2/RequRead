@@ -63,3 +63,30 @@ export const createRecipe = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const deleteRecipe = async (req: AuthRequest, res: Response) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id);
+
+    if (!recipe) {
+      return res.status(404).json({
+        message: "Recipe not found",
+      });
+    }
+
+    if (recipe.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: "You cannot delete this recipe",
+      });
+    }
+
+    await recipe.deleteOne();
+
+    return res.json({
+      message: "Recipe deleted",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
