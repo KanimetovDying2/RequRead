@@ -40,9 +40,11 @@ export const getRecipeById = async (req: Request, res: Response) => {
 
 export const createRecipe = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, image } = req.body;
+    const { title, description } = req.body;
 
-    if (!title?.trim() || !description?.trim() || !image?.trim()) {
+    const image = req.file?.path.replaceAll("\\", "/");
+
+    if (!title?.trim() || !description?.trim() || !image) {
       return res.status(400).json({
         message: "All fields are required",
       });
